@@ -48,9 +48,9 @@ def create_hood(request):
     else:
         form = NeighbourHoodForm()
     return render(request, 'main/newhood.html', {'form': form})
-    
+
 @login_required(login_url='/accounts/login/')
-def hood-details(request, hood_id):
+def hood_details(request, hood_id):
     hood = NeighbourHood.objects.get(id=hood_id)
     business = Business.objects.filter(neighbourhood=hood)
     posts = Post.objects.filter(hood=hood)
