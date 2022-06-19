@@ -14,8 +14,6 @@ def index(request):
 
 @login_required(login_url='/accounts/login/')
 def profile(request): 
-    current_user = request.user
-    user = current_user
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
@@ -24,9 +22,10 @@ def profile(request):
         return redirect('users-profile')
         
     else:
-        form = ProfileUpdateForm(instance=request.user.profile)
+        form = ProfileUpdateForm()
     
     return render(request, 'users/profile.html', {"form":form})
+
 
 def hoods(request):
     all_hoods = NeighbourHood.objects.all()
@@ -34,9 +33,10 @@ def hoods(request):
     params = {
         'all_hoods': all_hoods,
     }
-    return render(request, 'all_hoods.html', params)
+    return render(request, 'main/all_hoods.html', params)
 
 
+@login_required(login_url='/accounts/login/')
 def create_hood(request):
     if request.method == 'POST':
         form = NeighbourHoodForm(request.POST, request.FILES)
