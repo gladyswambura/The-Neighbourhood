@@ -1,44 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import User
-from pyuploadcare.dj.models import ImageField
 from PIL import Image
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 # Create your models here.
 # Extending User Model Using a One-To-One Link
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    avatar = models.ImageField(default='default.jpg', upload_to='profile_images')
-    bio = models.TextField()
-
-    def save_profile(self):
-        self.save()
-        
-        img = Image.open(self.photo.path)
-        if img.height > 300 or img.width > 300:
-            output_size = (300, 300)
-            img.thumbnail(output_size)
-            img.save(self.photo.path)
-
-    def delete_profile(self):
-        self.delete()
-
-
-    def __str__(self):
-        return f'{self.user.username} -profile'
-
-
 class NeighbourHood(models.Model):
-    name = models.CharField(max_length=50)
+    hood_name = models.CharField(max_length=50)
+    hood_logo = models.ImageField(default='default.jpg', upload_to='media/hood_logos')
     location = models.CharField(max_length=60)
-    admin = models.ForeignKey("Profile", on_delete=models.CASCADE, related_name='hood')
-    description = models.TextField()
-    health_officer = models.CharField(max_length=60, null=True, blank=True)
-    police_officer = models.CharField(max_length=60, null=True, blank=True)
+    hood_admin = models.ForeignKey("Profile", on_delete=models.CASCADE, related_name='hood_admin', null=True)
+    hood_description = models.TextField(null=True)
+    hood_health_officer_name = models.CharField(max_length=60, null=True, blank=True)
+    hood_police_officer_name = models.CharField(max_length=60, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.name} hood'
+        return f'{self.hood_name} hood'
 
     def create_neighborhood(self):
         self.save()
@@ -49,6 +27,27 @@ class NeighbourHood(models.Model):
     @classmethod
     def find_neighborhood(cls, neighborhood_id):
         return cls.objects.filter(id=neighborhood_id)
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    name = models.CharField(max_length=80, blank=True)
+    avatar = models.ImageField(default='default.jpg', upload_to='media/profile_images')
+    bio = models.TextField(max_length=254, blank=True)
+    location = models.CharField(max_length=50, blank=True, null=True)
+    neighbourhood = models.ForeignKey(NeighbourHood, on_delete=models.SET_NULL, null=True, related_name='members', blank=True)
+
+    def __str__(self):
+        return f'{self.user.username} profile'
+
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user=instance)
+
+    @receiver(post_save, sender=User)
+    def save_user_profile(sender, instance, **kwargs):
+        instance.profile.save()
+
 
 class Business(models.Model):
     name = models.CharField(max_length=120)
@@ -76,4 +75,9 @@ class Post(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='post_owner')
     hood = models.ForeignKey(NeighbourHood, on_delete=models.CASCADE, related_name='hood_post')
+
+    @classmethod
+    def get_by_user(cls, user):
+        posts = cls.objects.filter(user=user)
+        return posts
 
