@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Neighborhood{% endblock title %}
+{% load static %}
+{% load bootstrap4 %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% block content %}
+<div class="container-fluid mt-0">
+    {% if user.is_authenticated %}
+    <div class="text-white text-center"id="front-page">
+        {% if user.profile.neighbourhood %}
+        <h1 style="margin-top:5%">Enjoying your Neighbourhood?</h1>
+        <h5 style="margin-top:2%">Would you want to view Businesses && Alerts around?</h5>
+        <a href="{% url 'hood-details' user.profile.neighbourhood.id %}" class="btn btn-md btn-info mt-4">EXPLORE{{user.profile.neighbourhood.name}}</a>
+        {% else %}
+        <h1 style="margin-top:5%">Welcome to the Neighborhood</h1>
+        <h5 style="margin-top:3%">Here we keep you informed!</h5>
+        <a href="{% url 'hood' %}"><button type="button"style="margin-top:3%" class="btn btn-info btn-md">Join a Neighborhood!</button>
+        </a>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="row" style="background-color: #ffff;height:800px; margin-top: -35px;">
+        <div class="col-md-5 ml-5">
+            <h1 class="pt-5 font-weight-bolder font-size-bolder text-dark" style="margin-left: 300px;font-size:50px;margin-top:15%">
+                WELCOME TO THE NEIGHBORHOOD</h1>
+            <br>
+            <p class=" text-dark" style="margin-left: 300px;">Be informed of anything and everything happening around
+                you. Be updated </p>
+            <br>
+            <a href="{% url 'hood' %}" class="btn btn-lg btn-info"style="margin-left: 350px;">Pick Your Neighbourhood</a>
+        </div>
+        <div class="col-md-6" style="text-align:center;margin-top:8%">
+            <img src="{% static 'images/page1.gif' %}" width="300px" alt="">
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}
