@@ -1,6 +1,7 @@
 {% extends "users/base.html" %}
 {% block title %}neighborhood-Profile{% endblock title %}
 {% load bootstrap4 %}
+{% load static %}
 {% block content %}
 <div class="container">
     <br><br><br><br>
@@ -9,7 +10,7 @@
         <div class="d-flex col-md-6">
             <div class="media-image" style="text-shadow:0 4px 8px  whitesmoke;">
                 {% if user.profile.avatar %}
-                <img class="rounded-circle account-img" src="{{ user.profile.avatar.url }}" alt="course image"
+                <img class="rounded-circle account-img" src="{{ user.profile.avatar.url }}" alt="profile image"
                     height="150" width="150">
                 {% else %}
                 <img class="rounded-circle account-img" src="https://source.unsplash.com/1600x900/?user,profile"
@@ -34,7 +35,7 @@
             href="{% url 'hood-details' user.profile.neighbourhood.id %}">{{ user.profile.neighbourhood.hood_name }}--{{user.profile.neighbourhood.location}}</a>
     </p>
         <p class="text-center">{{ user.profile.neighbourhood.hood_description }}</p>
-        <img src="{{ user.profile.neighbourhood.hood_logo.url}}" alt="{{ user.profile.neighbourhood.hood_name }}"class="ml-5">
+        <img src="{{ user.profile.neighbourhood.hood_logo.url}}" alt="{{ user.profile.neighbourhood.hood_name }}"class="ml-5"style="margin-left:2000px;">
 
    
     {% endif %}
@@ -52,10 +53,7 @@
             <div class="modal-body">
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <div class="form-group">
-                        <label for="exampleFormControlFile1">Profile Picture</label>
-                        <input type="file" class="form-control-file" id="exampleFormControlFile1" name="avatar">
-                    </div>
+                    {% bootstrap_form form %}
                     <div class="form-group">
                         <button type="submit" class="btn blue-gradient btn-lg mt-2 font-weight-bold btn-block"> Update
                             Profile</button>
